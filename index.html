@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IMPORTANT: Please Read</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #ff00ff;
+    font-family: "Comic Sans MS", cursive;
+    overflow: hidden;
+    cursor: none;
+  }
+  #cursor {
+    position: fixed;
+    font-size: 28px;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%, -50%);
+  }
+  .popup {
+    position: fixed;
+    background: #c0c0c0;
+    border: 3px solid #000;
+    border-top: 3px solid #fff;
+    box-shadow: 3px 3px 0 #000;
+    z-index: 9999;
+    min-width: 300px;
+    font-size: 14px;
+  }
+  .popup-title {
+    background: #000080;
+    color: white;
+    padding: 4px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    cursor: move;
+    user-select: none;
+  }
+  .popup-title button {
+    background: #c0c0c0;
+    border: 2px solid;
+    border-color: #fff #000 #000 #fff;
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: "Comic Sans MS", cursive;
+  }
+  .popup-body {
+    padding: 14px;
+    text-align: center;
+    color: #000;
+  }
+  .popup-body p { margin-bottom: 10px; font-size: 13px; }
+  .popup-body button {
+    background: #c0c0c0;
+    border: 2px solid;
+    border-color: #fff #000 #000 #fff;
+    padding: 4px 18px;
+    margin: 4px;
+    cursor: pointer;
+    font-family: "Comic Sans MS", cursive;
+    font-size: 13px;
+  }
+  .popup-body button:active {
+    border-color: #000 #fff #fff #000;
+  }
+  #main-msg {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #ffff00;
+    font-size: 48px;
+    font-weight: bold;
+    text-shadow: 4px 4px 0 #000;
+    z-index: 1;
+    animation: shake 0.3s infinite;
+    pointer-events: none;
+  }
+  @keyframes shake {
+    0%   { transform: translate(-50%,-50%) rotate(-2deg) scale(1); }
+    25%  { transform: translate(-48%,-52%) rotate(2deg) scale(1.02); }
+    50%  { transform: translate(-52%,-48%) rotate(-1deg) scale(0.98); }
+    75%  { transform: translate(-50%,-50%) rotate(3deg) scale(1.01); }
+    100% { transform: translate(-50%,-50%) rotate(-2deg) scale(1); }
+  }
+  #bg-cats {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .bg-cat {
+    position: absolute;
+    font-size: 48px;
+    animation: floatcat linear infinite;
+    opacity: 0.25;
+    pointer-events: none;
+  }
+  @keyframes floatcat {
+    from { transform: translateY(110vh) rotate(0deg); opacity: 0.15; }
+    to   { transform: translateY(-20vh) rotate(720deg); opacity: 0.3; }
+  }
+  #status {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #c0c0c0;
+    border-top: 2px solid #fff;
+    padding: 3px 8px;
+    font-size: 12px;
+    color: #000;
+    z-index: 99998;
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor">🐱</div>
+<div id="bg-cats"></div>
+<div id="main-msg">🐱 YOU CANNOT ESCAPE 🐱<br><span style="font-size:22px">cats are being downloaded to ur pc rn</span></div>
+<div id="status">⚠️ Downloading cat #<span id="dl-count">1</span>... please do not turn off your computer</div>
+
+<script>
+// ---- Custom cursor ----
+const cur = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px';
+  cur.style.top = e.clientY + 'px';
+});
+
+// ---- Floating bg cats ----
+const emojis = ['🐱','🐈','🐾','😺','😸','😹','😻','🙀','😼'];
+const bgDiv = document.getElementById('bg-cats');
+for (let i = 0; i < 30; i++) {
+  const el = document.createElement('div');
+  el.className = 'bg-cat';
+  el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+  el.style.left = Math.random() * 100 + 'vw';
+  el.style.animationDuration = (4 + Math.random() * 8) + 's';
+  el.style.animationDelay = (-Math.random() * 10) + 's';
+  el.style.fontSize = (24 + Math.random() * 60) + 'px';
+  bgDiv.appendChild(el);
+}
+
+// ---- Popup system ----
+const messages = [
+  ["‼️ SYSTEM ALERT", "Your computer has been filled with cats.\nThis is not a drill.", ["OK", "OK but sadder"]],
+  ["🐱 Cat Update", "Another cat has been downloaded.\nYou now own 47 cats.", ["Nice", "Please stop"]],
+  ["🔒 SECURITY WARNING", "A cat has accessed your webcam.\nIt looks cute doing it.", ["Okay fine", "Dismiss"]],
+  ["📦 Download Complete", "Cat #69 downloaded successfully.\nFile name: fluffy_attack.jpg", ["Open file", "Close (won't work)"]],
+  ["😺 Important Notice", "You have been chosen.\nThe cats have selected you.", ["I accept", "I don't accept", ]],
+  ["⚠️ Warning", "Closing this tab will download\n500 more cats.", ["I understand", "Worth it"]],
+  ["🐾 Cat Census", "You now have more cats\nthan the local shelter.", ["Wow", "Cool"]],
+  ["💾 Storage Full", "Your hard drive is now 100% cat pics.\nOther files have been evicted.", ["RIP my files", "OK"]],
+];
+
+let popupCount = 0;
+let dlCount = 1;
+const dlSpan = document.getElementById('dl-count');
+
+function randomPos() {
+  return {
+    x: Math.random() * (window.innerWidth - 350),
+    y: Math.random() * (window.innerHeight - 200),
+  };
+}
+
+function makePopup() {
+  const msg = messages[popupCount % messages.length];
+  popupCount++;
+
+  const pop = document.createElement('div');
+  pop.className = 'popup';
+  const pos = randomPos();
+  pop.style.left = pos.x + 'px';
+  pop.style.top = pos.y + 'px';
+
+  pop.innerHTML = `
+    <div class="popup-title">
+      <span>${msg[0]}</span>
+      <button onclick="closePopup(this)">✕</button>
+    </div>
+    <div class="popup-body">
+      <p>${msg[1].replace('\n','<br>')}</p>
+      <div>${msg[2].map(b => `<button onclick="closePopup(this)">${b}</button>`).join('')}</div>
+    </div>`;
+
+  // make draggable
+  const title = pop.querySelector('.popup-title');
+  let dragging = false, ox = 0, oy = 0;
+  title.addEventListener('mousedown', e => {
+    dragging = true;
+    ox = e.clientX - pop.offsetLeft;
+    oy = e.clientY - pop.offsetTop;
+  });
+  document.addEventListener('mousemove', e => {
+    if (dragging) {
+      pop.style.left = (e.clientX - ox) + 'px';
+      pop.style.top  = (e.clientY - oy) + 'px';
+    }
+  });
+  document.addEventListener('mouseup', () => dragging = false);
+
+  document.body.appendChild(pop);
+  return pop;
+}
+
+function closePopup(btn) {
+  // closing spawns 2 more lol
+  const pop = btn.closest('.popup');
+  pop.remove();
+  setTimeout(makePopup, 100);
+  setTimeout(makePopup, 400);
+}
+
+// Spam cat downloads using real cat image API
+function downloadCat() {
+  dlCount++;
+  dlSpan.textContent = dlCount;
+
+  // Creates an invisible <a> that auto-clicks to trigger download
+  const a = document.createElement('a');
+  // Use picsum with a cat-ish seed (or thiscatdoesnotexist for real cats)
+  const seed = Math.floor(Math.random() * 1000);
+  a.href = `https://cataas.com/cat?${seed}`;
+  a.download = `cat_${dlCount}.jpg`;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// Block closing / navigation
+window.onbeforeunload = (e) => {
+  e.preventDefault();
+  e.returnValue = "The cats won't let you leave.";
+  return "The cats won't let you leave.";
+};
+
+// Keep focus stolen back
+window.addEventListener('blur', () => setTimeout(() => window.focus(), 100));
+
+// Background color seizure mode (mild)
+const colors = ['#ff00ff','#ff4400','#00aaff','#ffdd00','#00ff88','#ff0055'];
+let ci = 0;
+setInterval(() => {
+  document.body.style.background = colors[ci++ % colors.length];
+}, 600);
+
+// Start the chaos
+setTimeout(makePopup, 300);
+setInterval(makePopup, 2500);      // new popup every 2.5s
+setInterval(downloadCat, 3000);    // download a cat every 3s
+downloadCat(); // immediate first download
+</script>
+</body>
+</html>
