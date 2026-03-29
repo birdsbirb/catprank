@@ -218,21 +218,28 @@ function closePopup(btn) {
   setTimeout(makePopup, 400);
 }
 
-// Spam cat downloads using real cat image API
-function downloadCat() {
+// Spam cat downloads using blob fetch so it never navigates away
+async function downloadCat() {
   dlCount++;
   dlSpan.textContent = dlCount;
 
-  // Creates an invisible <a> that auto-clicks to trigger download
-  const a = document.createElement('a');
-  // Use picsum with a cat-ish seed (or thiscatdoesnotexist for real cats)
-  const seed = Math.floor(Math.random() * 1000);
-  a.href = `https://cataas.com/cat?${seed}`;
-  a.download = `cat_${dlCount}.jpg`;
-  a.style.display = 'none';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  try {
+    const seed = Math.floor(Math.random() * 9999);
+    const url = `https://cataas.com/cat?t=${seed}`;
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = `cat_${dlCount}.jpg`;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+  } catch(e) {
+    // silently fail if fetch blocked, try again next interval
+  }
 }
 
 // Block closing / navigation
